@@ -16,6 +16,7 @@ func cleanInput(text string) []string {
 
 func repl() {
 	scanner := bufio.NewScanner(os.Stdin)
+	config_Ptr := config{}
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
@@ -24,7 +25,7 @@ func repl() {
 		first_word := input_slice[0]
 		command, exists := getCommands()[first_word]
 		if exists {
-			err := command.callback()
+			err := command.callback(&config_Ptr)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -46,11 +47,35 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays the names of 20 location areas.",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the names of previous 20 location areas.",
+			callback:    commandMapB,
+		},
 	}
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
+}
+
+type pokemonLocation struct {
+	Count    int    `json:"count"`
+	Next     string `json:"next"`
+	Previous any    `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}
+type config struct {
+	Next string
+	Prev any
 }
