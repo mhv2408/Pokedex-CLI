@@ -7,9 +7,13 @@ import (
 	"net/http"
 )
 
-func explore(configPtr *config, location string) error {
+func commandExplore(configPtr *config, location ...string) error {
 
-	location_URL := curr_URL + location
+	if len(location) != 1 {
+		return fmt.Errorf("There cannot be more than 1 location...")
+	}
+
+	location_URL := curr_URL + location[0]
 	fmt.Println(location_URL)
 	res, err := http.Get(location_URL)
 	if err != nil {

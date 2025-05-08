@@ -1,42 +1,21 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-)
+import "fmt"
 
-func commandMapB(configPtr *config, location string) error {
-
-	if url, ok := configPtr.Prev.(string); ok {
-		curr_URL = url
-	} else {
-		fmt.Println("you're on the first page")
-		curr_URL = "https://pokeapi.co/api/v2/location-area/"
+func commandMapB(configPtr *config, args ...string) error {
+	if configPtr.prevLocationURL == nil {
+		return fmt.Errorf("you're on the first page")
 	}
-
-	res, err := http.Get(curr_URL)
+	respLoc, err := configPtr.pokeapliClient.ListLocations(configPtr.prevLocationURL)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
-	body, err := io.ReadAll(res.Body)
-	res.Body.Close()
-	if err != nil {
-		fmt.Println("Error in decoding the response body ", err)
-		return err
-	}
-	loc := pokemonLocation{}
-	err = json.Unmarshal(body, &loc)
 
-	if err != nil {
-		fmt.Println(err)
+	configPtr.nextLocationURL = respLoc.Next
+	configPtr.prevLocationURL = respLoc.Previous
+
+	for i := 0; i < len(respLoc.Results); i++ {
+		fmt.Println(respLoc.Results[i].Name)
 	}
-	for i := 0; i < len(loc.Results); i++ {
-		fmt.Println(loc.Results[i].Name)
-	}
-	configPtr.Next = loc.Next
-	configPtr.Prev = loc.Previous
 	return nil
 }

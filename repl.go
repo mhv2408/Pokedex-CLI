@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pokedexcli/internal/pokeapi"
 	"strings"
 )
 
@@ -64,7 +65,7 @@ func getCommands() map[string]cliCommand {
 		"explore": {
 			name:        "explore",
 			description: "Displays list of all Pokemons available in a location area as an",
-			callback:    explore,
+			callback:    commandExplore,
 		},
 	}
 }
@@ -72,21 +73,13 @@ func getCommands() map[string]cliCommand {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, string) error
+	callback    func(*config, ...string) error
 }
 
-type pokemonLocation struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous any    `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
 type config struct {
-	Next string
-	Prev any
+	pokeapliClient  pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
 }
 
 type pokemonLocationArea struct {
