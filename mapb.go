@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func commandMapB(configPtr *config) error {
+func commandMapB(configPtr *config, location string) error {
 
 	if url, ok := configPtr.Prev.(string); ok {
 		curr_URL = url

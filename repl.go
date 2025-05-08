@@ -23,9 +23,13 @@ func repl() {
 		input := scanner.Text()
 		input_slice := cleanInput(input)
 		first_word := input_slice[0]
+		second_word := ""
+		if len(input_slice) > 1 {
+			second_word = input_slice[1]
+		}
 		command, exists := getCommands()[first_word]
 		if exists {
-			err := command.callback(&config_Ptr)
+			err := command.callback(&config_Ptr, second_word)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -57,13 +61,18 @@ func getCommands() map[string]cliCommand {
 			description: "Displays the names of previous 20 location areas.",
 			callback:    commandMapB,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Displays list of all Pokemons available in a location area as an",
+			callback:    explore,
+		},
 	}
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 type pokemonLocation struct {
