@@ -10,6 +10,7 @@ import (
 var curr_URL = "https://pokeapi.co/api/v2/location-area/"
 
 func commandMap(configPtr *config) error {
+
 	res, err := http.Get(curr_URL)
 	if err != nil {
 		fmt.Println(err)
