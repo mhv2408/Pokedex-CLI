@@ -1,5 +1,5 @@
 package main
 
-func explore() {
-
+func explore(configPtr *config) error {
+	return nil
 }
