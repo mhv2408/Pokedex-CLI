@@ -6,6 +6,7 @@ import (
 	"os"
 	"pokedexcli/internal/pokeapi"
 	"strings"
+	"time"
 )
 
 func cleanInput(text string) []string {
@@ -17,25 +18,32 @@ func cleanInput(text string) []string {
 
 func repl() {
 	scanner := bufio.NewScanner(os.Stdin)
-	config_Ptr := config{}
+	pokeClient := pokeapi.NewClient(5*time.Second, time.Minute*5)
+
+	config_Ptr := &config{
+		pokeapliClient: pokeClient,
+	}
 	for {
 		fmt.Print("Pokedex > ")
 		scanner.Scan()
 		input := scanner.Text()
 		input_slice := cleanInput(input)
-		first_word := input_slice[0]
-		second_word := ""
-		if len(input_slice) > 1 {
-			second_word = input_slice[1]
+		if len(input_slice) == 0 {
+			continue
 		}
-		command, exists := getCommands()[first_word]
+		command_name := input_slice[0]
+		args := []string{}
+		if len(input_slice) > 1 {
+			args = input_slice[1:]
+		}
+		command, exists := getCommands()[command_name]
 		if exists {
-			err := command.callback(&config_Ptr, second_word)
+			err := command.callback(config_Ptr, args...)
 			if err != nil {
 				fmt.Println(err)
 			}
 		} else {
-			fmt.Println("Invalid Command")
+			fmt.Println("Unknown Command")
 		}
 	}
 }
@@ -80,57 +88,4 @@ type config struct {
 	pokeapliClient  pokeapi.Client
 	nextLocationURL *string
 	prevLocationURL *string
-}
-
-type pokemonLocationArea struct {
-	EncounterMethodRates []struct {
-		EncounterMethod struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"encounter_method"`
-		VersionDetails []struct {
-			Rate    int `json:"rate"`
-			Version struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"encounter_method_rates"`
-	GameIndex int `json:"game_index"`
-	ID        int `json:"id"`
-	Location  struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"location"`
-	Name  string `json:"name"`
-	Names []struct {
-		Language struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"language"`
-		Name string `json:"name"`
-	} `json:"names"`
-	PokemonEncounters []struct {
-		Pokemon struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"pokemon"`
-		VersionDetails []struct {
-			EncounterDetails []struct {
-				Chance          int   `json:"chance"`
-				ConditionValues []any `json:"condition_values"`
-				MaxLevel        int   `json:"max_level"`
-				Method          struct {
-					Name string `json:"name"`
-					URL  string `json:"url"`
-				} `json:"method"`
-				MinLevel int `json:"min_level"`
-			} `json:"encounter_details"`
-			MaxChance int `json:"max_chance"`
-			Version   struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"pokemon_encounters"`
 }
