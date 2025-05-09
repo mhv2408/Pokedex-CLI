@@ -22,6 +22,7 @@ func repl() {
 
 	config_Ptr := &config{
 		pokeapliClient: pokeClient,
+		caughtPokemon:  make(map[string]pokeapi.Pokemon),
 	}
 	for {
 		fmt.Print("Pokedex > ")
@@ -72,8 +73,13 @@ func getCommands() map[string]cliCommand {
 		},
 		"explore": {
 			name:        "explore",
-			description: "Displays list of all Pokemons available in a location area as an",
+			description: "Displays list of all Pokemons available in a location area",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Tries to Catch the given Pokemon",
+			callback:    commandCatch,
 		},
 	}
 }
@@ -88,4 +94,5 @@ type config struct {
 	pokeapliClient  pokeapi.Client
 	nextLocationURL *string
 	prevLocationURL *string
+	caughtPokemon   map[string]pokeapi.Pokemon
 }
