@@ -13,11 +13,11 @@ func commandInspect(configPtr *config, args ...string) error {
 		fmt.Printf("Weight: %d\n", pokemon.Weight)
 		fmt.Println("Stats:")
 		for i := 0; i < len(pokemon.Stats); i++ {
-			fmt.Printf("\t- %s: %d\n", pokemon.Stats[i].Stat.Name, pokemon.Stats[i].BaseStat)
+			fmt.Printf("  - %s: %d\n", pokemon.Stats[i].Stat.Name, pokemon.Stats[i].BaseStat)
 		}
 		fmt.Println("Types:")
 		for i := 0; i < len(pokemon.Types); i++ {
-			fmt.Printf("\t- %s\n", pokemon.Types[i].Type.Name)
+			fmt.Printf("  - %s\n", pokemon.Types[i].Type.Name)
 		}
 		return nil
 	}
